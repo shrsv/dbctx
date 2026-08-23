@@ -193,3 +193,33 @@ func ExampleIndex_Stats() {
 	fmt.Printf("Categorical fields: %d\n", stats.CategoricalFields)
 	fmt.Printf("JSONB paths:       %d\n", stats.JSONBPaths)
 }
+
+// ExampleIndex_SchemaFingerprint detects whether a .dtx file has gone stale
+// relative to the live database it describes, by comparing the fingerprint
+// stored at build time against one computed fresh right now.
+func ExampleIndex_SchemaFingerprint() {
+	ctx := context.Background()
+	dsn := "postgres://localhost/mydb"
+
+	idx, err := dbctx.Open("mydb.dtx")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer idx.Close()
+
+	stored, err := idx.SchemaFingerprint()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	live, err := dbctx.LiveFingerprint(ctx, dsn, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if stored != live {
+		fmt.Println("schema has drifted since this .dtx was built - rebuild before trusting it")
+	} else {
+		fmt.Println("schema fingerprint matches - .dtx is up to date")
+	}
+}
