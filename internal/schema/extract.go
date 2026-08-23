@@ -3,7 +3,9 @@ package schema
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
+	"time"
 
 	"github.com/shrsv/dbctx/internal/db"
 )
@@ -156,24 +158,41 @@ ORDER BY 3, 4, 1, 6;
 `
 
 func Extract(ctx context.Context, pg *db.PG, schemas string) (*ExtractedSchema, error) {
-	_, err := pg.Conn.Exec(ctx, fmt.Sprintf("SET app.dbctx_schemas = '%s'", strings.ReplaceAll(schemas, "'", "''")))
+	setSQL := fmt.Sprintf("SET app.dbctx_schemas = '%s'", strings.ReplaceAll(schemas, "'", "''"))
+	if os.Getenv("DBCTX_DEBUG") != "" {
+		fmt.Fprintf(os.Stderr, "[debug] schema.Extract: executing SET command\n")
+	}
+	_, err := pg.Conn.Exec(ctx, setSQL)
 	if err != nil {
 		return nil, fmt.Errorf("set schemas: %w", err)
 	}
 
+	if os.Getenv("DBCTX_DEBUG") != "" {
+		fmt.Fprintf(os.Stderr, "[debug] schema.Extract: executing extraction SQL (%d bytes)\n", len(extractionSQL))
+		fmt.Fprintf(os.Stderr, "[debug] schema.Extract: SQL preview (first 200 chars): %s\n", trunc(extractionSQL, 200))
+	}
+	queryStart := time.Now()
 	rows, err := pg.Conn.Query(ctx, extractionSQL)
 	if err != nil {
 		return nil, fmt.Errorf("query extraction: %w", err)
 	}
 	defer rows.Close()
+	if os.Getenv("DBCTX_DEBUG") != "" {
+		fmt.Fprintf(os.Stderr, "[debug] schema.Extract: Query() returned in %s, iterating rows...\n", time.Since(queryStart).Round(time.Millisecond))
+	}
 
 	result := &ExtractedSchema{
 		Columns: make(map[string][]Column),
 	}
 
 	tableByOID := make(map[string]*Table)
+	rowCount := 0
 
 	for rows.Next() {
+		rowCount++
+		if os.Getenv("DBCTX_DEBUG") != "" && rowCount%100 == 0 {
+			fmt.Fprintf(os.Stderr, "[debug] schema.Extract: scanned %d rows so far (%s)\n", rowCount, time.Since(queryStart).Round(time.Millisecond))
+		}
 		var kind, tableOID, schemaName, tableName, rowEstimate string
 		var attnum, attname, dataType, nullable string
 		var conName, refSchema, refTable, srcCols, dstCols string
@@ -216,7 +235,18 @@ func Extract(ctx context.Context, pg *db.PG, schemas string) (*ExtractedSchema, 
 		}
 	}
 
+	if os.Getenv("DBCTX_DEBUG") != "" {
+		fmt.Fprintf(os.Stderr, "[debug] schema.Extract: iteration done, %d rows scanned in %s\n", rowCount, time.Since(queryStart).Round(time.Millisecond))
+	}
+
 	return result, rows.Err()
+}
+
+func trunc(s string, n int) string {
+	if len(s) <= n {
+		return s
+	}
+	return s[:n] + "..."
 }
 
 func atoi(s string) int {

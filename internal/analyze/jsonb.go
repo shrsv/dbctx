@@ -154,7 +154,14 @@ func AnalyzeJSONB(ctx context.Context, pg *db.PG, ext *schema.ExtractedSchema, s
 	}
 
 	if len(tasks) == 0 {
+		if os.Getenv("DBCTX_DEBUG") != "" {
+			fmt.Fprintf(os.Stderr, "[debug] AnalyzeJSONB: no JSONB columns found, skipping\n")
+		}
 		return nil
+	}
+
+	if os.Getenv("DBCTX_DEBUG") != "" {
+		fmt.Fprintf(os.Stderr, "[debug] AnalyzeJSONB: %d tables with JSONB columns, spawning %d workers\n", len(tasks), min(4, len(tasks)))
 	}
 
 	numWorkers := 4
@@ -226,6 +233,10 @@ func processJSONBTask(ctx context.Context, pg *db.PG, task jsonbTask, results ch
 	tableStart := time.Now()
 	jsonbCols := 0
 
+	if os.Getenv("DBCTX_DEBUG") != "" {
+		fmt.Fprintf(os.Stderr, "[debug] processJSONBTask: starting table %s (row_estimate=%.0f)\n", task.Table.Name, task.Table.RowEstimate)
+	}
+
 	for _, col := range task.Cols {
 		dt := strings.ToLower(col.DataType)
 		if dt != "jsonb" && dt != "json" {
@@ -241,8 +252,15 @@ func processJSONBTask(ctx context.Context, pg *db.PG, task jsonbTask, results ch
 		whereClause := fmt.Sprintf("WHERE %s IS NOT NULL", colName)
 
 		q := sampleQuery(colName, tblName, whereClause, task.Table.RowEstimate, 50)
+		if os.Getenv("DBCTX_DEBUG") != "" {
+			fmt.Fprintf(os.Stderr, "[debug] processJSONBTask: %s.%s query: %s\n", task.Table.Name, col.Name, trunc(q, 150))
+		}
+		queryStart := time.Now()
 		rows, err := pg.Conn.Query(ctx, q)
 		if err != nil {
+			if os.Getenv("DBCTX_DEBUG") != "" {
+				fmt.Fprintf(os.Stderr, "[debug] processJSONBTask: %s.%s query FAILED in %s: %v\n", task.Table.Name, col.Name, time.Since(queryStart).Round(time.Millisecond), err)
+			}
 			continue
 		}
 
@@ -340,4 +358,11 @@ func collectLeafValues(val interface{}, prefix string, pathValues map[string]map
 			collectLeafValues(item, prefix+"[]", pathValues)
 		}
 	}
+}
+
+func trunc(s string, n int) string {
+	if len(s) <= n {
+		return s
+	}
+	return s[:n] + "..."
 }

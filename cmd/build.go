@@ -47,6 +47,11 @@ var buildCmd = &cobra.Command{
 			output = "dbctx.dtx"
 		}
 
+		// Propagate debug flag to sub-packages via env
+		if Debug {
+			os.Setenv("DBCTX_DEBUG", "1")
+		}
+
 		// Handle existing file
 		if _, err := os.Stat(output); err == nil {
 			if overwrite {
@@ -76,6 +81,12 @@ var buildCmd = &cobra.Command{
 		totalStart := time.Now()
 		var phaseStart time.Time
 
+		// Redact password for debug logging
+		if Debug {
+			redacted := redactDSN(dsn)
+			fmt.Fprintf(os.Stderr, "[debug] DSN: %s\n", redacted)
+		}
+
 		// Connect to PostgreSQL (pool with 4 connections for parallel analysis)
 		fmt.Fprintf(os.Stderr, "Connecting to PostgreSQL...\n")
 		pg, err := db.ConnectWithMaxConns(ctx, dsn, 4)
@@ -83,6 +94,10 @@ var buildCmd = &cobra.Command{
 			return err
 		}
 		defer pg.Close(ctx)
+
+		if Debug {
+			fmt.Fprintf(os.Stderr, "[debug] Connected to PostgreSQL (pool max_conns=4)\n")
+		}
 
 		// Open/create SQLite store
 		fmt.Fprintf(os.Stderr, "Creating %s...\n", output)
@@ -99,9 +114,15 @@ var buildCmd = &cobra.Command{
 		// Phase 1: Schema extraction
 		phaseStart = time.Now()
 		fmt.Fprintf(os.Stderr, "1/4 Extracting schema (schemas=%s)...\n", schemas)
+		if Debug {
+			fmt.Fprintf(os.Stderr, "[debug] Phase 1: schema.Extract(ctx, pg, %q)\n", schemas)
+		}
 		ext, err := schema.Extract(ctx, pg, schemas)
 		if err != nil {
 			return fmt.Errorf("schema extraction: %w", err)
+		}
+		if Debug {
+			fmt.Fprintf(os.Stderr, "[debug] Phase 1 result: %d tables, %d constraints\n", len(ext.Tables), len(ext.Constraints))
 		}
 		if err := storeSchema(store, ext); err != nil {
 			return fmt.Errorf("store schema: %w", err)
@@ -115,6 +136,9 @@ var buildCmd = &cobra.Command{
 		// Phase 2: Field analysis
 		phaseStart = time.Now()
 		fmt.Fprintf(os.Stderr, "2/4 Analyzing fields...\n")
+		if Debug {
+			fmt.Fprintf(os.Stderr, "[debug] Phase 2: analyze.AnalyzeFields(ctx, pg, ext, store, %q)\n", schemas)
+		}
 		if err := analyze.AnalyzeFields(ctx, pg, ext, store, schemas); err != nil {
 			return fmt.Errorf("field analysis: %w", err)
 		}
@@ -123,15 +147,20 @@ var buildCmd = &cobra.Command{
 		// Phase 3: JSONB analysis
 		phaseStart = time.Now()
 		fmt.Fprintf(os.Stderr, "3/4 Analyzing JSONB fields...\n")
+		if Debug {
+			fmt.Fprintf(os.Stderr, "[debug] Phase 3: analyze.AnalyzeJSONB(ctx, pg, ext, store)\n")
+		}
 		if err := analyze.AnalyzeJSONB(ctx, pg, ext, store); err != nil {
 			return fmt.Errorf("jsonb analysis: %w", err)
 		}
-		fmt.Fprintf(os.Stderr, "  done (%s)\n", time.Since(phaseStart).Round(time.Millisecond))
 		fmt.Fprintf(os.Stderr, "  done (%s)\n", time.Since(phaseStart).Round(time.Millisecond))
 
 		// Phase 4: Build FTS index
 		phaseStart = time.Now()
 		fmt.Fprintf(os.Stderr, "4/4 Building search index...\n")
+		if Debug {
+			fmt.Fprintf(os.Stderr, "[debug] Phase 4: store.InitFTS() + populateFTS(store)\n")
+		}
 		if err := store.InitFTS(); err != nil {
 			return fmt.Errorf("init fts: %w", err)
 		}
@@ -144,6 +173,9 @@ var buildCmd = &cobra.Command{
 		if !noSemantic {
 			phaseStart = time.Now()
 			fmt.Fprintf(os.Stderr, "5/5 Building semantic index...\n")
+			if Debug {
+				fmt.Fprintf(os.Stderr, "[debug] Phase 5: buildSemanticIndex(store, os.Stderr)\n")
+			}
 			buildSemanticIndex(store, os.Stderr)
 			fmt.Fprintf(os.Stderr, "  done (%s)\n", time.Since(phaseStart).Round(time.Millisecond))
 		}
@@ -380,4 +412,14 @@ func joinStrings(strs []string, sep string) string {
 		result += sep + s
 	}
 	return result
+}
+
+func redactDSN(dsn string) string {
+	// postgres://user:password@host:port/db -> postgres://user:***@host:port/db
+	at := strings.Index(dsn, "@")
+	colon := strings.Index(dsn, "://")
+	if at < 0 || colon < 0 {
+		return dsn
+	}
+	return dsn[:colon+3] + "***" + dsn[at:]
 }

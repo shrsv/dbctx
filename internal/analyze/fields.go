@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/shrsv/dbctx/internal/db"
@@ -135,9 +136,16 @@ func parseFloats(s string) []float64 {
 
 func AnalyzeFields(ctx context.Context, pg *db.PG, ext *schema.ExtractedSchema, store *db.Store, schemas string) error {
 	fmt.Fprintf(os.Stderr, "  Reading pg_stats...\n")
+	if os.Getenv("DBCTX_DEBUG") != "" {
+		fmt.Fprintf(os.Stderr, "[debug] AnalyzeFields: querying pg_stats for schemas=%s\n", schemas)
+	}
+	statsStart := time.Now()
 	stats, err := getStatsFromPG(ctx, pg, schemas)
 	if err != nil {
 		return fmt.Errorf("get pg_stats: %w", err)
+	}
+	if os.Getenv("DBCTX_DEBUG") != "" {
+		fmt.Fprintf(os.Stderr, "[debug] AnalyzeFields: pg_stats returned %d rows in %s\n", len(stats), time.Since(statsStart).Round(time.Millisecond))
 	}
 
 	statsMap := make(map[string]*pgStatRow)
