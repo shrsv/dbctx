@@ -93,11 +93,25 @@ make release-check
 
 # 2. Tag and push
 make tag V=v0.1.0
-
-# 3. Verify on pkg.go.dev (takes a few minutes to index)
-# Visit: https://pkg.go.dev/github.com/shrsv/dbctx@v0.1.0
-# Click "Request" if not yet indexed
 ```
+
+**Step 3 is mandatory and must be done by a human, not delegated to an
+agent** — an agent cannot reliably tell whether the request actually
+triggered a reindex versus hitting a cached/stale page, so this step needs
+a person watching the result:
+
+3. Go to `https://pkg.go.dev/github.com/shrsv/dbctx@v0.1.0` (swap in the
+   version you just tagged) and click **"Request"** if the page shows the
+   version isn't indexed yet. Reindexing takes 2-3 minutes.
+4. Confirm the page actually updated to show the new version's docs before
+   considering the release done.
+
+**Why this matters**: pkg.go.dev is where downstream consumers — including
+AI coding agents pulling in this package's docs — actually read the API
+from. A tag that exists in git but was never indexed on pkg.go.dev means
+anyone (human or agent) looking up `dbctx`'s docs sees the **previous**
+version's API, silently missing whatever the new tag added or changed.
+Tagging without indexing is not a finished release.
 
 ### Versioning rules
 
