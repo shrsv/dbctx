@@ -1,0 +1,32 @@
+# Makefile for dbctx releases
+# Usage: make release VERSION=v0.1.0
+
+VERSION ?= v0.1.0
+BINARY_NAME := dbctx
+BUILD_DIR := dist
+
+.PHONY: clean build release
+
+clean:
+	rm -rf $(BUILD_DIR)
+
+build:
+	mkdir -p $(BUILD_DIR)
+	GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o $(BUILD_DIR)/$(BINARY_NAME)_linux_amd64 ./cmd/dbctx
+	GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o $(BUILD_DIR)/$(BINARY_NAME)_linux_arm64 ./cmd/dbctx
+	GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o $(BUILD_DIR)/$(BINARY_NAME)_darwin_amd64 ./cmd/dbctx
+	GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o $(BUILD_DIR)/$(BINARY_NAME)_darwin_arm64 ./cmd/dbctx
+
+release: clean build
+	@echo "Creating release $(VERSION)..."
+	cd $(BUILD_DIR) && \
+	for binary in *; do \
+		tar -czf $${binary}.tar.gz $${binary} && \
+		rm $${binary}; \
+	done
+	@echo "Release artifacts created in $(BUILD_DIR)/"
+	@echo ""
+	@echo "To create a GitHub release:"
+	@echo "  1. git tag $(VERSION)"
+	@echo "  2. git push origin $(VERSION)"
+	@echo "  3. gh release create $(VERSION) $(BUILD_DIR)/*.tar.gz --title \"$(VERSION)\" --notes \"Release $(VERSION)\""
