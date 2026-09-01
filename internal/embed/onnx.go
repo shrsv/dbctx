@@ -28,11 +28,13 @@ var envOnce struct {
 	err error
 }
 
-// ensureEnvironment initializes the process-wide onnxruntime environment
-// exactly once. onnxruntime_go's environment is a global singleton, so
-// repeated OnnxEmbedder instances within one process share it.
+// ensureEnvironment initializes the process-wide onnxruntime environment once,
+// reusing it if another ONNX consumer in the same process already did.
 func ensureEnvironment(libPath string) error {
 	envOnce.Do(func() {
+		if ort.IsInitialized() {
+			return
+		}
 		ort.SetSharedLibraryPath(libPath)
 		envOnce.err = ort.InitializeEnvironment()
 	})
