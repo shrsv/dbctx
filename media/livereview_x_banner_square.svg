@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1500" height="500" viewBox="0 0 1500 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1220"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <radialGradient id="redGlow" cx="6%" cy="0%" r="55%">
+      <stop offset="0%" stop-color="#ef4444" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#ef4444" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="blueGlow" cx="97%" cy="100%" r="65%">
+      <stop offset="0%" stop-color="#1d56f0" stop-opacity="0.24"/>
+      <stop offset="100%" stop-color="#1d56f0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ctaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d56f0"/>
+    </linearGradient>
+    <style>
+      .bold { font-family: 'Liberation Sans', Arial, sans-serif; font-weight: 700; }
+      .reg  { font-family: 'Liberation Sans', Arial, sans-serif; font-weight: 400; }
+    </style>
+  </defs>
+
+  <g >
+    <rect width="1500" height="500" fill="url(#bg)"/>
+    <rect width="1500" height="500" fill="url(#redGlow)"/>
+    <rect width="1500" height="500" fill="url(#blueGlow)"/>
+  </g>
+
+  <rect x="0.75" y="0.75" width="1498.5" height="498.5" fill="none" stroke="#1e293b" stroke-width="1.5"/>
+
+  <!-- Main headline: centered in the dependable vertical band, with explicit word positions. -->
+  <g class="bold">
+    <text x="80" y="142" font-size="60" fill="#ef4444">Blast-Radius Aware</text>
+    <text x="645" y="142" font-size="60" fill="#f8fafc">AI Code Review</text>
+
+    <rect x="80" y="157" width="555" height="3" fill="#f87171"/>
+
+    <text x="80" y="224" font-size="60" fill="#f8fafc">for</text>
+    <text x="164" y="224" font-size="60" fill="#5b8cfb">Business-Critical Systems</text>
+    <text x="916" y="224" font-size="60" fill="#f8fafc">.</text>
+
+    <rect x="164" y="239" width="752" height="3" fill="#5b8cfb" opacity="0.85"/>
+  </g>
+
+  <!-- Product identity: top-right, aligned to the same right grid line as the CTA and URL. -->
+  <g transform="translate(1208,62)">
+    <g transform="translate(24,24)">
+      <circle r="30" fill="#1E429F" opacity="0.22"/>
+      <circle r="25" fill="#111827"/>
+      <circle r="25" fill="none" stroke="#3B82F6" stroke-width="2.5"/>
+      <circle r="12.5" fill="#60A5FA"/>
+      <circle r="6.25" fill="#1E40AF"/>
+      <circle cx="-4.4" cy="-4.7" r="3" fill="#ffffff" opacity="0.85"/>
+    </g>
+    <text x="65" y="35" class="bold" font-size="32">
+      <tspan fill="#f8fafc">Live</tspan><tspan fill="#3b82f6">Review</tspan>
+    </text>
+  </g>
+
+  <!-- CTA and URL share a strict right edge at x=1420. -->
+  <g transform="translate(1120,372)">
+    <rect width="300" height="56" rx="28" fill="url(#ctaGrad)"/>
+    <text x="150" y="36" text-anchor="middle" class="bold" font-size="19" fill="#ffffff">Explore LiveReview</text>
+    <path d="M 263 28 L 275 28 M 269 22 L 275 28 L 269 34"
+          stroke="#ffffff" stroke-width="2.4" fill="none"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <text x="1420" y="462" text-anchor="end" class="reg" font-size="15" fill="#64748b">
+    hexmos.com/livereview
+  </text>
+</svg>
