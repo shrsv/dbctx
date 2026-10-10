@@ -36,9 +36,9 @@
   <!-- Tagline: the sell, front and center -->
   <g transform="translate(56,40)">
     <text x="0" y="56" class="bold" font-size="54">
-      <tspan fill="#ef4444">Blast-Radius Aware</tspan><tspan fill="#f8fafc"> AI Code Review</tspan>
+      <tspan fill="#ef4444">Risk-Aware</tspan><tspan fill="#f8fafc"> AI Code Review</tspan>
     </text>
-    <rect x="0" y="68" width="459" height="3" fill="#f87171"/>
+    <rect x="0" y="68" width="291" height="3" fill="#f87171"/>
 
     <text x="0" y="130" class="bold" font-size="54">
       <tspan fill="#f8fafc">for </tspan><tspan fill="#5b8cfb">Business-Critical Systems</tspan><tspan fill="#f8fafc">.</tspan>

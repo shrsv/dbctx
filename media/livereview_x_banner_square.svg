@@ -33,10 +33,10 @@
 
   <!-- Main headline: centered in the dependable vertical band, with explicit word positions. -->
   <g class="bold">
-    <text x="80" y="142" font-size="60" fill="#ef4444">Blast-Radius Aware</text>
-    <text x="645" y="142" font-size="60" fill="#f8fafc">AI Code Review</text>
+    <text x="80" y="142" font-size="60" fill="#ef4444">Risk-Aware</text>
+    <text x="411" y="142" font-size="60" fill="#f8fafc">AI Code Review</text>
 
-    <rect x="80" y="157" width="555" height="3" fill="#f87171"/>
+    <rect x="80" y="157" width="322" height="3" fill="#f87171"/>
 
     <text x="80" y="224" font-size="60" fill="#f8fafc">for</text>
     <text x="164" y="224" font-size="60" fill="#5b8cfb">Business-Critical Systems</text>

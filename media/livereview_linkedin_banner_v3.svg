@@ -36,10 +36,10 @@
 
   <!-- 12-column-inspired layout: 80px outer margin, headline on left, brand on right. -->
   <g class="bold">
-    <text x="80" y="102" font-size="60" fill="#ef4444">Blast-Radius Aware</text>
-    <text x="644" y="102" font-size="60" fill="#f8fafc">AI Code Review</text>
+    <text x="80" y="102" font-size="60" fill="#ef4444">Risk-Aware</text>
+    <text x="410" y="102" font-size="60" fill="#f8fafc">AI Code Review</text>
 
-    <rect x="80" y="117" width="556" height="3" fill="#f87171"/>
+    <rect x="80" y="117" width="322" height="3" fill="#f87171"/>
 
     <text x="80" y="184" font-size="60" fill="#f8fafc">for</text>
     <text x="164" y="184" font-size="60" fill="#5b8cfb">Business-Critical Systems</text>

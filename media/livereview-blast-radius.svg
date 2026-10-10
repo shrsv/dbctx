@@ -16,9 +16,9 @@
 
   <!-- Line 1 -->
   <text x="0" y="66" class="bold" font-size="54">
-    <tspan fill="#dc2626">Blast-Radius Aware</tspan><tspan fill="#0f172a"> AI Code Review</tspan>
+    <tspan fill="#dc2626">Risk-Aware</tspan><tspan fill="#0f172a"> AI Code Review</tspan>
   </text>
-  <rect x="0" y="78" width="459" height="3" fill="#f87171"/>
+  <rect x="0" y="78" width="291" height="3" fill="#f87171"/>
 
   <!-- Line 2 -->
   <text x="0" y="140" class="bold" font-size="54">

@@ -1764,4 +1764,4 @@ Your team's attention is limited. Spend review effort where **business risk is h
 
 If dbctx is about giving AI systems compact, relevant context on your *database*, [**LiveReview**](https://hexmos.com/livereview) does the analogous thing for your *code changes*: instead of reviewing every diff with equal effort, it scores each change by blast radius — how far its impact reaches through your call graph — so review attention goes where it actually matters.
 
-[![LiveReview — Blast-Radius Aware AI Code Review for Business-Critical Systems](media/livereview-banner.png)](https://hexmos.com/livereview)
+[![LiveReview — Risk-Aware AI Code Review for Business-Critical Systems](media/livereview-banner.png)](https://hexmos.com/livereview)
