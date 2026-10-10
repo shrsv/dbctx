@@ -34,15 +34,15 @@
   <!-- Main headline: centered in the dependable vertical band, with explicit word positions. -->
   <g class="bold">
     <text x="80" y="142" font-size="60" fill="#ef4444">Risk-Aware</text>
-    <text x="411" y="142" font-size="60" fill="#f8fafc">AI Code Review</text>
+    <text x="422" y="142" font-size="60" fill="#f8fafc">AI Code Review</text>
 
     <rect x="80" y="157" width="322" height="3" fill="#f87171"/>
 
     <text x="80" y="224" font-size="60" fill="#f8fafc">for</text>
-    <text x="164" y="224" font-size="60" fill="#5b8cfb">Business-Critical Systems</text>
-    <text x="916" y="224" font-size="60" fill="#f8fafc">.</text>
+    <text x="177" y="224" font-size="60" fill="#5b8cfb">Business-Critical Systems</text>
+    <text x="928" y="224" font-size="60" fill="#f8fafc">.</text>
 
-    <rect x="164" y="239" width="752" height="3" fill="#5b8cfb" opacity="0.85"/>
+    <rect x="177" y="239" width="752" height="3" fill="#5b8cfb" opacity="0.85"/>
   </g>
 
   <!-- Product identity: top-right, aligned to the same right grid line as the CTA and URL. -->
